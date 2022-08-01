@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atguigu.dao.HouseBrokerDao">
+    <!--新增经纪人-->
+    <insert id="insert">
+        insert into hse_house_broker (id,
+                                      house_id,
+                                      broker_id,
+                                      broker_name,
+                                      broker_head_url)
+        values (#{id},
+                #{houseId},
+                #{brokerId},
+                #{brokerName},
+                #{brokerHeadUrl})
+    </insert>
+    <!--删除经纪人-->
+    <update id="delete">
+        update hse_house_broker
+        set update_time = now(),
+            is_deleted  = 1
+        where id = #{id}
+    </update>
+    <!--数据回显，根据id查询，继承于用于修改房东-->
+    <select id="getById" resultType="houseBroker">
+        select *
+        from hse_house_broker
+        where id = #{id}
+          and is_deleted = 0
+    </select>
+    <update id="update">
+        update hse_house_broker set
+        <if test="houseId != null and houseId != ''">
+            house_id = #{houseId} ,
+        </if>
+        <if test="brokerId != null and brokerId != ''">
+            broker_id = #{brokerId} ,
+        </if>
+        <if test="brokerName != null and brokerName != ''">
+            broker_name = #{brokerName} ,
+        </if>
+        <if test="brokerHeadUrl != null and brokerHeadUrl != ''">
+            broker_head_url = #{brokerHeadUrl} ,
+        </if>
+        update_time = now()
+        where
+        id = #{id}
+    </update>
+    <!--详情页面显示经纪人-->
+    <select id="findListByHouseId" resultType="HouseBroker">
+        select id,
+               house_id,
+               broker_id,
+               broker_name,
+               broker_head_url,
+               create_time,
+               update_time,
+               is_deleted
+        from hse_house_broker
+        where house_id = #{houseId}
+          and is_deleted = 0
+    </select>
+</mapper>

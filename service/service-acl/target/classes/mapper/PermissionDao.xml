@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atguigu.dao.PermissionDao">
+    <!--查询所有权限-->
+    <select id="findAll" resultType="permission">
+        select *
+        from acl_permission
+        where is_deleted = 0
+    </select>
+    <!--三表联查，查询当前用户的权限信息-->
+    <select id="findPermissionsListByAdminId" resultType="com.atguigu.entity.Permission">
+        SELECT DISTINCT 用户权限表.*
+        FROM acl_admin_role AS 用户角色表
+                 JOIN acl_role_permission AS 用户权限表 ON 用户权限表.role_id = 用户角色表.role_id
+                 INNER JOIN acl_permission AS 权限表 ON 权限表.id = 用户权限表.permission_id
+        WHERE 用户角色表.admin_id = #{adminId}
+          AND 权限表.type = 0
+          AND 用户角色表.is_deleted = 0
+          AND 用户权限表.is_deleted = 0
+          AND 权限表.is_deleted = 0
+    </select>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into acl_permission (id,
+                                    parent_id,
+                                    name,
+                                    url,
+                                    code,
+                                    type,
+                                    sort)
+        values (#{id},
+                #{parentId},
+                #{name},
+                #{url},
+                #{code},
+                #{type},
+                #{sort})
+    </insert>
+
+    <update id="update">
+        update acl_permission set
+        <if test="parentId != null and parentId != ''">
+            parent_id = #{parentId} ,
+        </if>
+        <if test="name != null and name != ''">
+            name = #{name} ,
+        </if>
+        <if test="url != null and url != ''">
+            url = #{url} ,
+        </if>
+        <if test="code != null and code != ''">
+            code = #{code} ,
+        </if>
+        <if test="type != null and type != ''">
+            type = #{type} ,
+        </if>
+        <if test="sort != null and sort != ''">
+            sort = #{sort} ,
+        </if>
+        update_time = now()
+        where
+        id = #{id}
+    </update>
+
+    <update id="delete">
+        update acl_permission
+        set update_time = now(),
+            is_deleted  = 1
+        where id = #{id}
+    </update>
+
+    <select id="getById" resultType="Permission">
+        select *
+        from acl_permission
+        where id = #{id}
+    </select>
+</mapper>

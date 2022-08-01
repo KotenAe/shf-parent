@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atguigu.dao.HouseImageDao">
+    <!-- 查找房屋图片，通过houseId-->
+    <select id="findImageList" resultType="com.atguigu.entity.HouseImage">
+        select id,
+               house_id,
+               image_name,
+               image_url,
+               type,
+               create_time,
+               update_time,
+               is_deleted
+        from hse_house_image
+        where is_deleted = 0
+          AND house_id = #{houseId}
+          AND TYPE = #{type}
+    </select>
+    <!--上传图片-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into hse_house_image(house_id, image_name, image_url, type)
+        values (#{houseId}, #{imageName}, #{imageUrl}, #{type})
+    </insert>
+    <!-- 删除图片-->
+    <update id="delete">
+        update hse_house_image
+        set is_deleted=1
+        where id = #{id}
+    </update>
+    <!--根据id查询-->
+    <select id="getById" resultType="houseImage">
+        select *
+        from hse_house_image
+        where id = #{id}
+          and is_deleted = 0
+    </select>
+</mapper>
